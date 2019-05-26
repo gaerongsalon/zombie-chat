@@ -18,9 +18,6 @@ lib/env.g.dart
 *.iws
 .idea/
 
-# Visual Studio Code related
-.vscode/
-
 # Flutter/Dart/Pub related
 **/doc/api/
 .dart_tool/
@@ -71,3 +68,9 @@ lib/env.g.dart
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+
+# Eclipse related
+.classpath
+.project
+.settings/
+
