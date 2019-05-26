@@ -59,6 +59,13 @@ export const disconnect: APIGatewayProxyHandler = async event => {
 };
 
 export const broadcast: APIGatewayProxyHandler = async event => {
+  // Step 1. Prepare data strings.
+  const data = JSON.parse(event.body);
+  const now = Date.now();
+  const dataForMe = JSON.stringify({ ...data, _now: now, _me: true });
+  const dataForOthers = JSON.stringify({ ...data, _now: now, _me: false });
+
+  // Step 2. Read all connection ids from DynamoDB.
   const dbResult = await ddb
     .scan({
       TableName: connectionTableName,
@@ -71,12 +78,13 @@ export const broadcast: APIGatewayProxyHandler = async event => {
     return { statusCode: 200, body: "OK" };
   }
 
+  // Step 3. Prepare ApiGatewayManagementApi client.
   const apimgmt = new AWS.ApiGatewayManagementApi({
     apiVersion: "2018-11-29",
     endpoint: event.requestContext.domainName + "/" + event.requestContext.stage
   });
 
-  const data = event.body;
+  // Step 4. Send a message to all of peers.
   const promises = dbResult.Items.map(async ({ connectionId }) => {
     console.log(`item`, connectionId);
     if (!connectionId) {
@@ -87,14 +95,18 @@ export const broadcast: APIGatewayProxyHandler = async event => {
       return;
     }
     try {
-      console.log(`Send a data into a connection`, connectionId, data);
+      // Step 4-1. Send `dataForMe` if it is me, otherwise, `dataForOther`.
+      const me = event.requestContext.connectionId === connectionId.S;
+      const reply = me ? dataForMe : dataForOthers;
+      console.log(`Send a data into a connection`, connectionId, reply);
       await apimgmt
         .postToConnection({
           ConnectionId: connectionId.S,
-          Data: data
+          Data: reply
         })
         .promise();
     } catch (postError) {
+      // Step 4-2. Delete a connection from DynamoDB if it is broken.
       console.error(
         `Error while post a data via a connection`,
         connectionId,
@@ -111,6 +123,8 @@ export const broadcast: APIGatewayProxyHandler = async event => {
       }
     }
   });
+
+  // Step 5. Wait all promises to complete all of sending jobs.
   try {
     await Promise.all(promises);
   } catch (promiseError) {
