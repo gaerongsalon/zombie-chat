@@ -1,13 +1,10 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
-import * as AWS from "aws-sdk";
-import install from "./apigatewaymanagementapi";
+import { DynamoDB, ApiGatewayManagementApi } from "aws-sdk";
 
 import "source-map-support/register";
 
-install(AWS);
-
 const connectionTableName = process.env.CONNECTION_TABLE_NAME;
-const ddb = new AWS.DynamoDB();
+const ddb = new DynamoDB();
 
 export const connect: APIGatewayProxyHandler = async event => {
   try {
@@ -79,7 +76,7 @@ export const broadcast: APIGatewayProxyHandler = async event => {
   }
 
   // Step 3. Prepare ApiGatewayManagementApi client.
-  const apimgmt = new AWS.ApiGatewayManagementApi({
+  const apimgmt = new ApiGatewayManagementApi({
     apiVersion: "2018-11-29",
     endpoint: event.requestContext.domainName + "/" + event.requestContext.stage
   });
