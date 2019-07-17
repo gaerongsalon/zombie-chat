@@ -34,7 +34,7 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       body: SafeArea(
         child: BlocProvider(
-            bloc: this._bloc,
+            builder: (context) => this._bloc,
             child: BlocBuilder(
               bloc: this._bloc,
               builder: this._buildContent,
