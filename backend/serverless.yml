@@ -12,15 +12,6 @@ provider:
         - "execute-api:ManageConnections"
       Resource:
         - "arn:aws:execute-api:*:*:**/@connections/*"
-    - Effect: "Allow"
-      Action:
-        - "dynamodb:PutItem"
-        - "dynamodb:DeleteItem"
-        - "dynamodb:Scan"
-      Resource:
-        - Fn::GetAtt: [ConnectionTable, Arn]
-  environment:
-    CONNECTION_TABLE_NAME: ${env:CONNECTION_TABLE_NAME}
 
 plugins:
   - serverless-webpack
@@ -47,19 +38,3 @@ functions:
     events:
       - websocket:
           route: $default
-
-resources:
-  Resources:
-    ConnectionTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${env:CONNECTION_TABLE_NAME}
-        AttributeDefinitions:
-          - AttributeName: connectionId
-            AttributeType: S
-        KeySchema:
-          - AttributeName: connectionId
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5

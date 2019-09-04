@@ -9,11 +9,21 @@
     "deploy": "sls deploy"
   },
   "dependencies": {
-    "source-map-support": "^0.5.10"
+    "@yingyeothon/repository": "^0.1.2",
+    "@yingyeothon/repository-redis": "^0.1.0",
+    "ioredis": "^4.14.0",
+    "mem": "^5.1.1",
+    "source-map-support": "^0.5.10",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.30",
+    "@types/ioredis": "^4.0.14",
     "@types/node": "10",
+    "@types/uuid": "^3.4.5",
+    "@yingyeothon/actor-system": "^0.1.6",
+    "@yingyeothon/actor-system-aws-lambda-support": "^0.1.4",
+    "@yingyeothon/actor-system-redis-support": "^0.1.2",
     "aws-sdk": "2.437.0",
     "serverless": "^1.47.0",
     "serverless-webpack": "^5.3.1",
